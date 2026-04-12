@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hex PCs</title>
+  <style>
+    :root {
+      --bg: #07131b;
+      --bg-2: #0b1f2b;
+      --panel: rgba(10, 26, 37, 0.82);
+      --panel-2: rgba(12, 35, 48, 0.92);
+      --line: rgba(104, 255, 197, 0.18);
+      --text: #eefcff;
+      --muted: #98b8bf;
+      --blue: #39a9ff;
+      --green: #42f5b6;
+      --blue-2: #1e6fff;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(57,169,255,0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(66,245,182,0.16), transparent 26%),
+        linear-gradient(180deg, #08121a 0%, #061018 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .orb {
+      position: fixed;
+      inset: auto;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: .18;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb.one { top: 80px; left: -60px; background: var(--blue); }
+    .orb.two { bottom: 60px; right: -50px; background: var(--green); }
+
+    .shell {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, calc(100% - 32px));
+      margin: 20px auto 40px;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border: 1px solid var(--line);
+      background: rgba(7, 19, 27, 0.7);
+      backdrop-filter: blur(16px);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 16px;
+      z-index: 5;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      font-size: 1.15rem;
+    }
+
+    .brand-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      color: white;
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      box-shadow: 0 0 28px rgba(57,169,255,0.28);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: .2s ease;
+      font-weight: 600;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      background: linear-gradient(135deg, rgba(57,169,255,.16), rgba(66,245,182,.12));
+      border-color: var(--line);
+      color: white;
+    }
+
+    section {
+      scroll-margin-top: 100px;
+      margin-top: 22px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      backdrop-filter: blur(14px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .hero {
+      position: relative;
+      padding: 68px 28px;
+      background:
+        radial-gradient(circle at 18% 15%, rgba(57,169,255,0.22), transparent 20%),
+        radial-gradient(circle at 82% 24%, rgba(66,245,182,0.18), transparent 24%),
+        linear-gradient(160deg, rgba(13, 32, 44, 0.9), rgba(7, 19, 27, 0.92));
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--green);
+      font-weight: 700;
+      background: rgba(255,255,255,0.03);
+      margin-bottom: 16px;
+    }
+
+    h1, h2, h3 { margin: 0; }
+
+    .hero h1 {
+      font-size: clamp(2.3rem, 5vw, 4.6rem);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      max-width: 10ch;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--blue), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+      max-width: 58ch;
+      margin: 18px 0 28px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 16px;
+      padding: 14px 18px;
+      transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+      border: 1px solid var(--line);
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary {
+      color: #041016;
+      background: linear-gradient(135deg, var(--green), #8efad9);
+      box-shadow: 0 14px 28px rgba(66,245,182,0.2);
+    }
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .hero-card {
+      position: relative;
+      padding: 24px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(16, 43, 58, 0.95), rgba(9, 22, 31, 0.95));
+      border: 1px solid rgba(255,255,255,0.08);
+      min-height: 330px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: auto -60px -60px auto;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(57,169,255,0.28), transparent 65%);
+    }
+
+    .price-chip {
+      display: inline-flex;
+      align-self: flex-start;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(66,245,182,0.12);
+      border: 1px solid rgba(66,245,182,0.28);
+      color: var(--green);
+      font-weight: 800;
+      font-size: .92rem;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .stat {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: .85rem;
+      margin-bottom: 8px;
+    }
+
+    .stat-value {
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 28px 28px 0;
+    }
+
+    .section-head p {
+      color: var(--muted);
+      margin: 10px 0 0;
+      max-width: 60ch;
+      line-height: 1.7;
+    }
+
+    .content-pad { padding: 28px; }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 8px;
+    }
+
+    .mini-card {
+      padding: 20px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .mini-card h3 { margin-bottom: 10px; }
+    .mini-card p { margin: 0; color: var(--muted); line-height: 1.7; }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .product-card,
+    .detail-card {
+      border-radius: 24px;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(13, 34, 47, 0.96), rgba(7, 19, 27, 0.96));
+      border: 1px solid rgba(255,255,255,0.07);
+      min-height: 100%;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(57,169,255,.1);
+      color: #83ccff;
+      border: 1px solid rgba(57,169,255,.2);
+      border-radius: 999px;
+      font-size: .85rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .product-name {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      margin-bottom: 8px;
+    }
+
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 18px 0 22px;
+      flex-wrap: wrap;
+    }
+
+    .sale-price {
+      font-size: 2.3rem;
+      font-weight: 900;
+      color: white;
+    }
+
+    .old-price {
+      color: #7fa0a8;
+      text-decoration: line-through;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .save-pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(66,245,182,0.12);
+      color: var(--green);
+      font-weight: 800;
+      border: 1px solid rgba(66,245,182,0.24);
+    }
+
+    .product-copy {
+      color: var(--muted);
+      line-height: 1.8;
+      margin: 0 0 22px;
+    }
+
+    .detail-card h3 { margin-bottom: 18px; }
+
+    .spec-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .spec-list li {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 12px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      align-items: start;
+    }
+
+    .spec-key {
+      font-size: .82rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #7fdaff;
+    }
+
+    .spec-value {
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .contact-wrap {
+      display: grid;
+      grid-template-columns: 1fr .8fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .contact-box,
+    .contact-card {
+      padding: 26px;
+      border-radius: 24px;
+      background: linear-gradient(180deg, rgba(13, 34, 47, 0.96), rgba(7, 19, 27, 0.96));
+      border: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .email-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 18px;
+      text-decoration: none;
+      color: white;
+      font-size: 1.08rem;
+      font-weight: 800;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .footer {
+      text-align: center;
+      color: #86a2aa;
+      padding: 24px 8px 8px;
+      font-size: .95rem;
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .product-grid,
+      .contact-wrap,
+      .cards {
+        grid-template-columns: 1fr;
+      }
+      .spec-list li { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .shell { width: min(100% - 20px, 1180px); }
+      .navbar { padding: 14px; }
+      .hero, .content-pad { padding: 22px; }
+      .section-head { padding: 22px 22px 0; }
+      .hero h1 { max-width: none; }
+      .sale-price { font-size: 2rem; }
+      .nav-links { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb one"></div>
+  <div class="orb two"></div>
+
+  <div class="shell">
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-badge">H</div>
+        <div>Hex PCs</div>
+      </div>
+      <div class="nav-links">
+        <a href="#home" class="active">Home</a>
+        <a href="#pcs">PCs</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </nav>
+
+    <section id="home" class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="eyebrow">Blue. Green. Built Different.</div>
+          <h1>Modern custom prebuilts from <span>Hex PCs</span>.</h1>
+          <p>
+            Clean aesthetics, strong gaming performance, and carefully chosen components.
+            Hex PCs focuses on sleek, modern systems that look sharp on the desk and run hard in-game.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#pcs">Shop PCs</a>
+            <a class="btn btn-secondary" href="#contact">Contact Us</a>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div>
+            <div class="price-chip">Featured Sale Build</div>
+            <h2 style="font-size: 2rem; margin: 16px 0 8px;">GLACIAL I</h2>
+            <p style="margin:0; color: var(--muted); line-height: 1.75;">
+              A frosted white gaming prebuilt with a clean RGB setup, fast storage, and balanced power for modern titles.
+            </p>
+          </div>
+          <div>
+            <div class="stat-grid">
+              <div class="stat">
+                <div class="stat-label">Sale Price</div>
+                <div class="stat-value">$1300</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Original</div>
+                <div class="stat-value" style="text-decoration: line-through; color: #84a0a7;">$1400</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">GPU</div>
+                <div class="stat-value">RTX 5060</div>
+              </div>
+              <div class="stat">
+                <div class="stat-label">Storage</div>
+                <div class="stat-value">1TB NVMe</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <div>
+          <h2>Why Hex PCs</h2>
+          <p>Designed to feel premium, built to stay clean, and tuned for a modern storefront look.</p>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="cards">
+          <div class="mini-card">
+            <h3>Modern Look</h3>
+            <p>Sharp glass-panel styling, bold gradients, and a premium blue-green brand identity that feels current.</p>
+          </div>
+          <div class="mini-card">
+            <h3>Balanced Parts</h3>
+            <p>Hardware choices focus on gaming performance, clean cooling, and dependable everyday speed.</p>
+          </div>
+          <div class="mini-card">
+            <h3>Simple Buying</h3>
+            <p>Browse the lineup, open a build, review the specs, and contact Hex PCs directly for questions.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pcs">
+      <div class="section-head">
+        <div>
+          <h2>PCs</h2>
+          <p>Browse current Hex PCs prebuilts. Click the listing card to jump to the full specification view.</p>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="product-grid">
+          <div class="product-card">
+            <div class="tag">On Sale</div>
+            <div class="product-name">GLACIAL I</div>
+            <p class="product-copy">
+              A white, RGB-forward gaming prebuilt built around a clean GIGABYTE EAGLE OC ICE RTX 5060 setup.
+            </p>
+            <div class="price-row">
+              <div class="sale-price">$1300</div>
+              <div class="old-price">$1400</div>
+              <div class="save-pill">Save $100</div>
+            </div>
+            <a class="btn btn-primary" href="#glacial-specs">View Specs</a>
+          </div>
+
+          <div class="detail-card" id="glacial-specs">
+            <h3>GLACIAL I Specs</h3>
+            <ul class="spec-list">
+              <li>
+                <div class="spec-key">GPU</div>
+                <div class="spec-value">GIGABYTE EAGLE OC ICE RTX5060</div>
+              </li>
+              <li>
+                <div class="spec-key">CPU</div>
+                <div class="spec-value">RYZEN 5 5600</div>
+              </li>
+              <li>
+                <div class="spec-key">RAM</div>
+                <div class="spec-value">LEXAR ARES DDR4 16GB</div>
+              </li>
+              <li>
+                <div class="spec-key">Storage</div>
+                <div class="spec-value">1TB NVME</div>
+              </li>
+              <li>
+                <div class="spec-key">Cooler</div>
+                <div class="spec-value">TR PEERLESS ASASSIN</div>
+              </li>
+              <li>
+                <div class="spec-key">Case</div>
+                <div class="spec-value">MC-3TCOREM</div>
+              </li>
+              <li>
+                <div class="spec-key">Fans</div>
+                <div class="spec-value">6 RGB 120 MM AURA SYNC</div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="section-head">
+        <div>
+          <h2>Contact</h2>
+          <p>Questions about builds, availability, or custom requests? Reach out directly.</p>
+        </div>
+      </div>
+      <div class="content-pad">
+        <div class="contact-wrap">
+          <div class="contact-box">
+            <h3 style="font-size: 1.8rem; margin-bottom: 12px;">Get in touch with Hex PCs</h3>
+            <p style="color: var(--muted); line-height: 1.8; margin: 0; max-width: 56ch;">
+              For sales inquiries, questions about GLACIAL I, or future prebuilt drops, email us and we’ll get back to you.
+            </p>
+            <a class="email-link" href="mailto:hexpcs.com@gmail.com">hexpcs.com@gmail.com</a>
+          </div>
+          <div class="contact-card">
+            <div class="tag" style="margin-bottom: 14px;">Hex PCs</div>
+            <h3 style="margin-bottom: 10px;">Modern prebuilts. Clean presentation.</h3>
+            <p style="color: var(--muted); line-height: 1.8; margin: 0;">
+              Built for standout listings, modern desks, and straightforward performance. Hex PCs keeps the focus on design and value.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">© 2026 Hex PCs. All rights reserved.</div>
+  </div>
+
+  <script>
+    const links = document.querySelectorAll('.nav-links a');
+    const sections = [...document.querySelectorAll('section[id]')];
+
+    const setActive = () => {
+      const y = window.scrollY + 140;
+      let current = sections[0]?.id;
+      for (const section of sections) {
+        if (y >= section.offsetTop) current = section.id;
+      }
+      links.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === `#${current}`);
+      });
+    };
+
+    window.addEventListener('scroll', setActive);
+    setActive();
+  </script>
+</body>
+</html>
